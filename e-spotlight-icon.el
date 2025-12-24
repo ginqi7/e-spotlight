@@ -25,7 +25,7 @@
 ;;; Code:
 
 (defcustom e-spotlight-icon-directory
-  (locate-user-emacs-file "e-spotlight-icons")
+  (expand-file-name (locate-user-emacs-file "e-spotlight-icons"))
   "Directory to store cached icons."
   :type 'directory)
 
