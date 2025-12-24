@@ -39,6 +39,8 @@
 
 ;;; Code:
 
+(require 'e-spotlight-icon)
+
 (defvar e-spotlight-frame--input-font
   (font-spec :family
              (face-attribute 'default :family)

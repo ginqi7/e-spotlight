@@ -36,8 +36,9 @@
 
 ;;; Code:
 
-(provide 'e-spotlight-obj)
+(require 'e-spotlight-obj)
 (require 'e-spotlight-frame)
+(require 'e-spotlight-process)
 
 (defvar e-spotlight--candidates nil "Candidates.")
 (defvar e-spotlight--selected-index 0 "Selected index.")

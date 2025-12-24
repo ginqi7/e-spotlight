@@ -77,8 +77,8 @@
                    (setq output (funcall parse output)))
                  (when filter
                    (setq output (funcall filter raw-str output)))
-                 output)))))
-
+                 (setq e-spotlight--candidates (append e-spotlight--candidates output))
+                 (e-spotlight-update))))))
 
 
 (cl-defmethod e-spotlight-candidate-run ((candidate e-spotlight-candidate))

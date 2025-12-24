@@ -105,11 +105,7 @@
      "sh"
      (lambda (value)
        (e-spotlight-cache-put "process" name value ttl)
-       (setq
-        e-spotlight--candidates
-        (append e-spotlight--candidates
-                (funcall callback value)))
-       (e-spotlight-update))
+       value)
      nil
      "-c"
      shell-command)
