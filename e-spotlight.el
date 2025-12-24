@@ -72,10 +72,10 @@
   "Extract completions, removing the length tail if present."
   ;; NOTE: completions 可能是以整数结尾的非正规列表
   ;; 使用 length, dolist butlast 等列表操作都可能会报错
-  ;; 可以使用 (take (1- (safe-length completions) completions)) 去除最后一个元素
+  ;; 可以使用 (take (safe-length completions) completions)) 去除最后一个不正规的元素
   (if (proper-list-p completions)
       completions
-    (take (1- (safe-length completions)) completions)))
+    (take (safe-length completions) completions)))
 
 
 (defun e-spotlight--filter (str table)
@@ -87,9 +87,9 @@
 
 (defun e-spotlight--update-candidates ()
   "Update candidates."
-  (setq e-spotlight--candidates
-        (cl-mapcan (lambda (p) (e-spotlight-plugin-candidates p e-spotlight--input))
-                   e-spotlight--current-plugins))
+  (setq e-spotlight--candidates nil)
+  (mapc (lambda (p) (e-spotlight-plugin-candidates p e-spotlight--input))
+        e-spotlight--current-plugins)
   (e-spotlight-update))
 
 
