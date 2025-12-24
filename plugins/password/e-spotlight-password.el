@@ -86,5 +86,7 @@
                                    :filter #'e-spotlight--filter))
 
 
+(add-to-list 'e-spotlight-plugin-prefix '(e-spotlight-password . "pass"))
+
 (provide 'e-spotlight-password)
 ;;; e-spotlight-password.el ends here

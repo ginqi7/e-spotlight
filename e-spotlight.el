@@ -40,6 +40,10 @@
 (require 'e-spotlight-frame)
 (require 'e-spotlight-process)
 
+(defcustom e-spotlight-plugin-prefix
+  nil
+  "")
+
 (defvar e-spotlight--candidates nil "Candidates.")
 (defvar e-spotlight--selected-index 0 "Selected index.")
 (defvar e-spotlight--selected-overlay nil "Selected overlay.")
@@ -51,16 +55,17 @@
 (defvar e-spotlight--input
   (e-spotlight-input
    :raw ""
-   :type ""
-   :link '("")
    :prev ""
+   :separator " "
+   :prefix nil
+   :keyword ""
    :updated nil)
   "input.")
-
 
 (defvar e-spotlight--buffers
   (make-hash-table :test 'equal)
   "Buffers.")
+
 (defvar e-spotlight--frames
   (make-hash-table :test 'equal)
   "Frames.")

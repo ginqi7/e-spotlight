@@ -106,6 +106,9 @@
                                    :parse #'e-spotlight-application-parse
                                    :filter #'e-spotlight--filter))
 
+(add-to-list 'e-spotlight-plugin-prefix
+             '(e-spotlight-application . "app"))
+
 (provide 'e-spotlight-application)
 ;;; e-spotlight-application.el ends here
 

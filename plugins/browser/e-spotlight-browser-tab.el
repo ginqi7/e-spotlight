@@ -50,7 +50,7 @@
                          e-spotlight-browser-tab-active-jsa-path
                          e-spotlight-browser-app-name
                          (gethash "id" data))))
-    (print command)
+    ;; (print command)
     (shell-command-to-string command)))
 
 (defun e-spotlight-browser-tab-close (data)
@@ -58,7 +58,7 @@
                          e-spotlight-browser-tab-close-jsa-path
                          e-spotlight-browser-app-name
                          (gethash "id" data))))
-    (print command)
+    ;; (print command)
     (shell-command-to-string command)))
 
 (defun e-spotlight-browser-tab-copy-url (data)
@@ -109,10 +109,11 @@
 (add-to-list 'e-spotlight-plugins (e-spotlight-browser-tab
                                    :fetch #'e-spotlight-process-async-run-shell
                                    :command #'e-spotlight-browser-tab-command
-                                   :ttl 1
+                                   :ttl 10
                                    :parse #'e-spotlight-browser-tab-parse
                                    :filter #'e-spotlight--filter))
 
+(add-to-list 'e-spotlight-plugin-prefix '(e-spotlight-browser-tab . "bt"))
 
 (provide 'e-spotlight-browser-tab)
 ;;; e-spotlight-browser-tab.el ends here

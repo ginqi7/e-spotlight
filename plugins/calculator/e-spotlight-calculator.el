@@ -40,9 +40,9 @@
   (kill-new (gethash "value" data)))
 
 
-(defun e-spotlight-calculator-command (raw-str)
-  (map-into (list (cons "exp"  raw-str)
-                  (cons "value"  (format "%s"(calc-eval raw-str))))
+(defun e-spotlight-calculator-command (keyword)
+  (map-into (list (cons "exp"  keyword)
+                  (cons "value"  (format "%s"(calc-eval keyword))))
             '(hash-table :test equal)))
 
 (defun e-spotlight-calculator-parse (data)

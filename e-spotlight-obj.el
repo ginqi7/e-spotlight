@@ -34,9 +34,9 @@
 
 (defclass e-spotlight-input ()
   ((separator :initarg :separator)
+   (prefix :initarg :prefix)
+   (keyword :initarg :keyword)
    (raw :initarg :raw)
-   (type :initarg :type)
-   (link :initarg :link)
    (prev :initarg :prev)
    (updated :initarg :updated)))
 
@@ -58,16 +58,19 @@
   (funcall callback command))
 
 (cl-defmethod e-spotlight-plugin-candidates ((plugin e-spotlight-plugin) (input e-spotlight-input))
-  (let* ((raw-str (eieio-oref
-                   e-spotlight--input
-                   'raw)))
-    (let ((fetch (e-spotlight-obj-get plugin 'fetch))
-          (command (if (stringp (e-spotlight-obj-get plugin 'command))
-                       (e-spotlight-obj-get plugin 'command)
-                     (funcall (e-spotlight-obj-get plugin 'command) raw-str)))
-          (ttl (e-spotlight-obj-get plugin 'ttl))
-          (parse (e-spotlight-obj-get plugin 'parse))
-          (filter (e-spotlight-obj-get plugin 'filter)))
+  (let* ((plugin-name (class-name (object-class plugin)))
+         (plugin-prefix (alist-get plugin-name e-spotlight-plugin-prefix))
+         (prefix (e-spotlight-obj-get e-spotlight--input 'prefix))
+         (keyword (e-spotlight-obj-get e-spotlight--input 'keyword))
+         (fetch (e-spotlight-obj-get plugin 'fetch))
+         (command (if (stringp (e-spotlight-obj-get plugin 'command))
+                      (e-spotlight-obj-get plugin 'command)
+                    (funcall (e-spotlight-obj-get plugin 'command) keyword)))
+         (ttl (e-spotlight-obj-get plugin 'ttl))
+         (parse (e-spotlight-obj-get plugin 'parse))
+         (filter (e-spotlight-obj-get plugin 'filter)))
+    (when (or (not prefix)
+              (string= prefix plugin-prefix))
       (funcall fetch
                (symbol-name (class-name (object-class plugin)))
                command
@@ -76,24 +79,33 @@
                  (when parse
                    (setq output (funcall parse output)))
                  (when filter
-                   (setq output (funcall filter raw-str output)))
+                   (setq output (funcall filter keyword output)))
                  (setq e-spotlight--candidates (append e-spotlight--candidates output))
                  (e-spotlight-update))))))
 
 
 (cl-defmethod e-spotlight-candidate-run ((candidate e-spotlight-candidate))
   (when-let* ((action (e-spotlight-obj-get candidate 'action)))
-    (funcall action (eieio-oref candidate 'value))))
+    (funcall action (e-spotlight-obj-get candidate 'value))))
 
 
 (cl-defmethod e-spotlight-input-update ((input e-spotlight-input) raw-str)
-  (let* ((prev (eieio-oref input 'raw))
-         (updated (not (string= prev raw-str))))
+  (let* ((prev (e-spotlight-obj-get input 'raw))
+         (separator (e-spotlight-obj-get input 'separator))
+         (updated (not (string= prev raw-str)))
+         (input-items (split-string raw-str separator t)))
     (eieio-oset input 'raw raw-str)
     (eieio-oset input 'prev prev)
     (eieio-oset input 'updated updated)
-    (eieio-oset input 'link nil)
-    input))
+    (if (<= (length input-items) 1)
+        (progn
+          (eieio-oset input 'prefix nil)
+          (eieio-oset input 'keyword (car input-items)))
+      (eieio-oset input 'prefix (car input-items))
+      (eieio-oset input 'keyword (string-join (cdr input-items) " ")))
+    (unless (e-spotlight-obj-get input 'keyword)
+      (eieio-oset input 'keyword "")))
+  input)
 
 (provide 'e-spotlight-obj)
 ;;; e-spotlight-obj.el ends here
