@@ -37,7 +37,7 @@
 
 
 (defun e-spotlight-calculator-copy (data)
-  (kill-new (gethash "value" data)))
+  (e-spotlight-copy (gethash "value" data)))
 
 
 (defun e-spotlight-calculator-command (keyword)

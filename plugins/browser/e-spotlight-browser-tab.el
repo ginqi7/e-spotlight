@@ -62,7 +62,7 @@
     (shell-command-to-string command)))
 
 (defun e-spotlight-browser-tab-copy-url (data)
-  (kill-new (gethash "url" data)))
+  (e-spotlight-copy (gethash "url" data)))
 
 (defun e-spotlight-browser-tab-actions-parse (data)
   (let* ((table (map-into

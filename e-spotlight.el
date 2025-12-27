@@ -102,6 +102,22 @@
 (defun e-spotlight--get-buffer (name)
   (gethash name e-spotlight--buffers))
 
+(defvar-local e-spotlight--input-update-timer nil)
+
+(defun e-spotlight--schedule-input-update (&optional delay)
+  (let ((delay (or delay 0.3)))
+    (when (timerp e-spotlight--input-update-timer)
+      (cancel-timer e-spotlight--input-update-timer))
+    (setq e-spotlight--input-update-timer
+          (run-with-idle-timer
+           delay nil
+           (lambda (buf)
+             (when (buffer-live-p buf)
+               (with-current-buffer buf
+                 (e-spotlight-update-input))))
+           (current-buffer)))))
+
+
 
 (defun e-spotlight--init-input-buffer-watcher ()
   (when-let* ((buff (e-spotlight--get-buffer 'input)))    
@@ -110,7 +126,10 @@
         (meow-insert))
       (add-hook 'after-change-functions
                 (lambda (start end length)
-                  (e-spotlight-update-input))
+                  ;; (print "123")
+                  (e-spotlight--schedule-input-update 0.3))
+                ;; (e-spotlight-update-input)
+                
                 nil t))))
 
 (defun e-spotlight--get-input ()

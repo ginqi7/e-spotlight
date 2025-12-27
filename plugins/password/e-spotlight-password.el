@@ -39,13 +39,12 @@
 (defclass e-spotlight-password-actions (e-spotlight-password)
   ((application :initarg :application)))
 
-(defun e-spotlight-password-actions-parse (output)
-  (let* ((data (json-parse-string output :array-type 'list))
-         (table (map-into
+(defun e-spotlight-password-actions-parse (data)
+  (let* ((table (map-into
                  (list (cons (format "Copy %s user name." (gethash "name" data))
-                             (lambda (_) (kill-new (gethash "username" (gethash "data" data)))))
+                             (lambda (_) (e-spotlight-copy (gethash "username" data))))
                        (cons (format "Copy %s password." (gethash "name" data))
-                             (lambda (_) (kill-new (gethash "password" (gethash "data" data))))))
+                             #'e-spotlight-password-copy-password))
                  '(hash-table :test equal))))
     (maphash (lambda (key value)
                (puthash key (e-spotlight-candidate
@@ -56,6 +55,11 @@
              table)
     table))
 
+(defun e-spotlight-password-copy-password (data)
+  (e-spotlight-copy (string-trim
+                     (shell-command-to-string
+                      (format "rbw get %s" (gethash "id" data))))))
+
 (defun e-spotlight-password-parse (output)
   (let ((table (make-hash-table :test #'equal))
         (json (json-parse-string output :array-type 'list)))
@@ -64,9 +68,10 @@
                (e-spotlight-candidate
                 :key (gethash "name" item)
                 :value item
+                :action #'e-spotlight-password-copy-password
                 :plugins (list (e-spotlight-password-actions
-                                :fetch #'e-spotlight-process-async-run-shell
-                                :command (lambda (_) (format "rbw get %s --raw" (gethash "id" item)))
+                                :fetch #'e-spotlight-fetch
+                                :command (lambda (_) item)
                                 :ttl 1
                                 :parse #'e-spotlight-password-actions-parse
                                 :filter #'e-spotlight--filter))
@@ -74,14 +79,10 @@
                table))
     table))
 
-(defun e-spotlight-password-command (str)
-  (format "rbw search %s --raw" str))
-
-
 (add-to-list 'e-spotlight-plugins (e-spotlight-password
                                    :fetch #'e-spotlight-process-async-run-shell
-                                   :command #'e-spotlight-password-command
-                                   :ttl 1
+                                   :command "rbw list --raw"
+                                   :ttl 60
                                    :parse #'e-spotlight-password-parse
                                    :filter #'e-spotlight--filter))
 

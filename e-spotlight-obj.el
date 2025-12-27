@@ -107,5 +107,9 @@
       (eieio-oset input 'keyword "")))
   input)
 
+(defun e-spotlight-copy (str)
+  (when str
+    (kill-new str)))
+
 (provide 'e-spotlight-obj)
 ;;; e-spotlight-obj.el ends here
